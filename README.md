@@ -40,21 +40,34 @@ Veri + CRC baytı birlikte aynı algoritmadan geçirilirse, **doğru pakette son
 
 | Dosya | Ne işe yarar? |
 |---|---|
-| `crc8_1wire.py` | Ödevin ana programı: CRC hesaplama, paket doğrulama, üç zorunlu test, tek bit hata algılama |
+| `crc8_1wire.py` | Ödevin ana programı: CRC hesaplama, paket doğrulama, üç zorunlu test, tek bit hata algılama; komut satırından HEX veri de alır |
+| `crc8_1wire.c` | Aynı algoritmanın C versiyonu (mikrodenetleyiciye taşınabilir) |
+| `crc8_tablo.py` | 256 elemanlı arama tablosuyla hızlı versiyon, bit bit sonuçla karşılaştırma |
 | `crc8_trace.py` | Algoritmayı bit bit adım adım tablo olarak gösterir |
+| `test_crc8.py` | 15 otomatik test (`unittest`) |
 | `crc8_grafik.py` | Tek bit hatası taramasını grafiğe döker (`hata_algilama.png`) |
 | `hata_algilama.png` | Üretilmiş grafik |
+| `RAPOR.md` | Kısa ödev raporu |
 
 ## Çalıştırma
 
 ```bash
-python crc8_1wire.py          # ödevin istediği çıktı (A, B, C, D)
-python crc8_trace.py 1        # Test 1'in bit bit izlemesi (2 ve 3 de olur)
-pip install matplotlib        # yalnızca grafik için gerekli
-python crc8_grafik.py         # hata_algilama.png üretir
+python crc8_1wire.py                 # ödevin istediği çıktı (A, B, C, D)
+python crc8_1wire.py 01 23 45 67 89 AB CD EF   # kendi verinin CRC'sini hesapla
+python crc8_1wire.py --paket 28 FF 6C 92 91 16 04 3A   # son bayt CRC: paketi doğrula
+
+python crc8_trace.py 1               # Test 1'in bit bit izlemesi (2 ve 3 de olur)
+python crc8_tablo.py                 # tablo versiyonu + bit bit karşılaştırma
+python -m unittest -v test_crc8      # otomatik testler
+
+gcc -Wall -Wextra -o crc8 crc8_1wire.c && ./crc8   # C versiyonu (Windows: crc8.exe)
+
+pip install matplotlib               # yalnızca grafik için gerekli
+python crc8_grafik.py                # hata_algilama.png üretir
 ```
 
-`crc8_1wire.py` ve `crc8_trace.py` yalnızca standart kütüphane kullanır.
+Matplotlib dışındaki tüm Python dosyaları yalnızca standart kütüphane kullanır.
+`--paket` modu, paket geçersizse `2` çıkış koduyla biter.
 
 ## Test sonuçları
 
